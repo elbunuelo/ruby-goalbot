@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Leagues</h1>
+
+<div id="leagues">
+  <% @leagues.each do |league| %>
+    <%= render league %>
+    <p>
+      <%= link_to "Show this league", league %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New league", new_league_path %>

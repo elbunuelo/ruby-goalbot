@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  startTimestamp: 1
+  previousLegEventId: 1
+  ss_id: 1
+  slug: MyString
+  home_team: one
+  away_team: one
+
+two:
+  startTimestamp: 1
+  previousLegEventId: 1
+  ss_id: 1
+  slug: MyString
+  home_team: two
+  away_team: two

@@ -1,0 +1,37 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  event: one
+  player_name: MyString
+  reason: MyString
+  incident_class: MyString
+  incident_type: MyString
+  time: 1
+  ss_id: 1
+  is_home: false
+  text: MyString
+  home_score: 1
+  away_score: 1
+  added_time: 1
+  player_in: MyString
+  player_out: MyString
+  length: 1
+  description: MyString
+
+two:
+  event: two
+  player_name: MyString
+  reason: MyString
+  incident_class: MyString
+  incident_type: MyString
+  time: 1
+  ss_id: 1
+  is_home: false
+  text: MyString
+  home_score: 1
+  away_score: 1
+  added_time: 1
+  player_in: MyString
+  player_out: MyString
+  length: 1
+  description: MyString
