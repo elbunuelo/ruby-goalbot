@@ -23,7 +23,7 @@ class EventManager
 
     if before_start_time
       Rails.logger.debug "[Incident Fetch] Event #{event.slug} hasn't started yet"
-      next
+      return
     end
 
     # TODO: Don't fetch incidents when the event has ended
@@ -65,5 +65,51 @@ class EventManager
 
     event.last_incident_seen = event.incidents.maximum(:ss_id)
     event.save
+  end
+
+  def self.fetch_day_events
+    date = Date.today.to_s
+
+    # Filter out events with a different date or from a league we're not
+    # following
+    events = Sofascore::Client.fetch_events(date).select do |event_data|
+      next unless Date.today == Time.at(event_data['startTimestamp']).to_date
+
+      next unless League.find_by(ss_id: event_data['tournament']['uniqueTournament']['id'])
+
+      true
+    end
+
+    # Create event records for filtered events
+    events.map do |event_data|
+      home_team_data = event_data['homeTeam']
+      home_team = Team.create_or_find_by!(
+        {
+          ss_id: home_team_data['id'],
+          slug: home_team_data['slug'],
+          short_name: home_team_data['shortName']
+        }
+      )
+
+      away_team_data = event_data['awayTeam']
+      away_team = Team.create_or_find_by!(
+        {
+          ss_id: away_team_data['id'],
+          slug: away_team_data['slug'],
+          short_name: away_team_data['shortName']
+        }
+      )
+
+      Event.create_or_find_by!(
+        {
+          start_timestamp: event_data['startTimestamp'],
+          previous_leg_ss_id: event_data.fetch('previousLegEventId', nil),
+          ss_id: event_data['id'],
+          home_team: home_team,
+          away_team: away_team,
+          date: Date.today
+        }
+      )
+    end
   end
 end
