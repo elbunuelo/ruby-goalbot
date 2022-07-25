@@ -3,5 +3,6 @@ module Incidents
 
   module Types
     GOAL = 'goal'
+    PERIOD = 'period'
   end
 end

@@ -1,6 +1,8 @@
 class Incident < ApplicationRecord
   belongs_to :event
 
+  after_create :maybe_cancel_incident_fetch
+
   scope :goals_pending_link, lambda {
                                where(incident_type: Incidents::Types::GOAL, search_suspended: false, video_url: nil)
                              }
@@ -27,5 +29,13 @@ class Incident < ApplicationRecord
         away_score: goal_info[:away_score]
       }
     )
+  end
+
+  private
+
+  def maybe_cancel_incident_fetch
+    return unless incident_type == Incidents::Type::PERIOD && text = 'FT'
+
+    Resque.remove_schedule(event.schedule_name)
   end
 end

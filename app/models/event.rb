@@ -11,19 +11,11 @@ class Event < ApplicationRecord
     subscriptions.exists?
   end
 
-  def self.for_team(team)
-    Event.todays_events.where('home_team_id = ? OR away_team_id = ?', team.id, team.id).first
+  def schedule_name
+    "#{event.slug}-#{event.date}"
   end
 
-  def schedule_incident_fetch
-    config
-    Resque.set_schedule(
-      slug,
-      {
-        class: 'EventIncidentsFetcher',
-        args: self,
-        every: '1m'
-      }
-    )
+  def self.for_team(team)
+    Event.todays_events.where('home_team_id = ? OR away_team_id = ?', team.id, team.id).first
   end
 end
