@@ -2,6 +2,7 @@ class Incident < ApplicationRecord
   belongs_to :event
 
   after_create :maybe_cancel_incident_fetch
+  after_create :maybe_schedule_search_cancellation
 
   scope :goals_pending_link, lambda {
                                where(incident_type: Incidents::Types::GOAL, search_suspended: false, video_url: nil)
@@ -15,12 +16,6 @@ class Incident < ApplicationRecord
     Rails.logger.info "[Incident] Comparing teams #{event.home_team.name} #{goal[:home_team]} (#{home_score}) and #{event.away_team.name} #{goal[:away_team]} (#{away_score})"
 
     home_score >= Matching::MIN_MATCH_SCORE && away_score >= Matching::MIN_MATCH_SCORE
-  end
-
-  def search_time_exceeded?
-    return false unless searching_since
-
-    Time.now - searching_since > Incidents::MAX_SEARCH_TIME
   end
 
   def self.for_goal(goal_info)
@@ -39,6 +34,12 @@ class Incident < ApplicationRecord
     return unless incident_type == Incidents::Types::PERIOD && text == 'FT'
 
     Resque.remove_schedule(event.schedule_name)
+  end
+
+  def maybe_schedule_search_cancellation
+    return unless incident_type == Incidents::Types::GOAL
+
+    Rake.enqueue_in(Incidents::MAX_SEARCH_TIME, CancelGoalSearch, id)
   end
 
   def self.from_hash(incident_data)

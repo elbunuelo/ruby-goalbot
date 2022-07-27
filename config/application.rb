@@ -27,9 +27,10 @@ module RubyGoalbot
         {
           class: 'FetchDayEvents',
           persist: true,
-          every: ['6h', { first_in: '1s' }]
+          every: '6h'
         }
       )
+      FetchDayEvents.perform
     end
   end
 end
