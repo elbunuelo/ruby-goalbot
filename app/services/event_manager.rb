@@ -17,44 +17,25 @@ class EventManager
   end
 
   def self.fetch_incidents(event)
-    Rails.logger.debug "[Incident Fetch] Fetching incidents for #{event.slug}"
+    Resque.logger.info "[Incident Fetch] Fetching incidents for #{event.slug}"
 
     before_start_time = Time.now.to_i < event.start_timestamp
 
     if before_start_time
-      Rails.logger.debug "[Incident Fetch] Event #{event.slug} hasn't started yet"
+      Resque.logger.info "[Incident Fetch] Event #{event.slug} hasn't started yet"
       return
     end
 
     # TODO: Don't fetch incidents when the event has ended
 
-    incidents = Sofascore::Client.fetch_incidents(event.ss_id)&.select do |incident|
-      incident_id = incident.fetch('id', 0)
-      !event.last_incident_seen || incident_id > event.last_incident_seen
-    end
+    incidents = Sofascore::Client.fetch_incidents(event.ss_id)
 
-    Rails.logger.debug "[Incident Fetch] Found #{incidents.count} new incidents"
+    Resque.logger.info "[Incident Fetch] Found #{incidents.count} new incidents" if incidents
 
     incidents&.each do |incident|
-      player_name = incident.fetch('player_name', nil) || incident.fetch('player', {}).fetch('name', nil)
+      next if event.incidents.find_by(ss_id: incident['id'])
 
-      incident_attrs = {
-        player_name: player_name,
-        reason: incident.fetch('reason', nil),
-        incident_class: incident.fetch('incidentClass', nil),
-        incident_type: incident.fetch('incidentType', nil),
-        time: incident.fetch('time', nil),
-        ss_id: incident.fetch('id', nil),
-        is_home: incident.fetch('isHome', nil),
-        text: incident.fetch('text', nil),
-        home_score: incident.fetch('homeScore', nil),
-        away_score: incident.fetch('awayScore', nil),
-        added_time: incident.fetch('addedTime', nil),
-        player_in: incident.fetch('playerIn', {}).fetch('name', nil),
-        player_out: incident.fetch('playerOut', {}).fetch('name', nil),
-        length: incident.fetch('length', nil),
-        description: incident.fetch('description', nil)
-      }
+      incident_attrs = Incident.from_hash incident
 
       if event.monitored? && incident_attrs[:incident_type] == Incidents::Types::GOAL
         incident_attrs[:searching_since] = Time.now
@@ -62,9 +43,6 @@ class EventManager
 
       event.incidents.create(incident_attrs)
     end
-
-    event.last_incident_seen = event.incidents.maximum(:ss_id)
-    event.save
   end
 
   def self.fetch_day_events
@@ -72,6 +50,7 @@ class EventManager
 
     # Filter out events with a different date or from a league we're not
     # following
+    Resque.logger.info("[EventManager] Fetching day events for #{date}")
     events = Sofascore::Client.fetch_events(date).select do |event_data|
       next unless Date.today == Time.at(event_data['startTimestamp']).to_date
 
@@ -79,37 +58,12 @@ class EventManager
 
       true
     end
+    Resque.logger.info("[EventManager] Found #{events.count} events in followed leagues")
 
     # Create event records for filtered events
     events.map do |event_data|
-      home_team_data = event_data['homeTeam']
-      home_team = Team.create_or_find_by!(
-        {
-          ss_id: home_team_data['id'],
-          slug: home_team_data['slug'],
-          short_name: home_team_data['shortName']
-        }
-      )
-
-      away_team_data = event_data['awayTeam']
-      away_team = Team.create_or_find_by!(
-        {
-          ss_id: away_team_data['id'],
-          slug: away_team_data['slug'],
-          short_name: away_team_data['shortName']
-        }
-      )
-
-      Event.create_or_find_by!(
-        {
-          start_timestamp: event_data['startTimestamp'],
-          previous_leg_ss_id: event_data.fetch('previousLegEventId', nil),
-          ss_id: event_data['id'],
-          home_team: home_team,
-          away_team: away_team,
-          date: Date.today
-        }
-      )
+      Resque.logger.info("[EventManager] Importing #{event_data['slug']}")
+      Event.from_hash(event_data)
     end
   end
 end

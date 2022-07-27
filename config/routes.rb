@@ -1,3 +1,6 @@
+require 'resque/scheduler'
+require 'resque/scheduler/server'
+
 Rails.application.routes.draw do
   resources :leagues
   resources :subscriptions, only: [:create]

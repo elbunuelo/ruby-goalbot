@@ -27,7 +27,7 @@ gem 'stimulus-rails'
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem 'jbuilder'
 
-gem 'redd', git: 'https://github.com/adsteel/redd.git'
+gem 'redd', git: 'https://github.com/elbunuelo/redd.git'
 
 gem 'httparty'
 

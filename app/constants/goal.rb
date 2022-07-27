@@ -1,5 +1,5 @@
 module Goal
-  GOAL_REGEX = /^(?<category>\[[\w\s]+\])?\s*(?<home_team>[^\[(]+)\s*(?<home_goals>[\[(]?\d+[)\]]?)\s*-\s*(?<away_goals>[\[(]?\d+[\])]?)\s*(?<away_team>[^\[(]+)\s*(?<aggregate>\[[^\]]+\])?\s+[-—]/
+  GOAL_REGEX = /^(?<category>\[[\w\s]+\])?\s*(?<home_team>[^\[(]+)\s+(?<home_goals>[\[(]?\d+[)\]]?)-\s*(?<away_goals>[\[(]?\d+[\])]?)\s*(?<away_team>[^\[(]+)\s*(?<aggregate>\[[^\]]+\])?\s+(?<rest>.+)/
   SCORE_REGEX = /^[\[(]\d+[\])]$/
 
   HOME_TEAM = 1

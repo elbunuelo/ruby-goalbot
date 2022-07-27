@@ -1,5 +1,5 @@
 module Incidents
-  MAX_SEARCH_TIME = 15 * 60
+  MAX_SEARCH_TIME = 15.minutes
 
   module Types
     GOAL = 'goal'

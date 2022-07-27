@@ -6,14 +6,27 @@ class Subscription < ApplicationRecord
   private
 
   def schedule_incident_fetch
-    return if Resque.fetch_schedule event.schedule_name
+    if Resque.fetch_schedule event.schedule_name
+      Rails.logger.info("[Subscription] Found schedule for #{event.schedule_name}")
+      return
+    end
+
+    every = '1m'
+    Rails.logger.info("[Subscription] It is #{Time.now}, the event starts at #{Time.at(event.start_timestamp)}")
+    if Time.now.to_i < event.start_timestamp
+      Rails.logger.info("[Subscription] Fetching will start at #{Time.at(event.start_timestamp)}")
+      every = [every, { first_at: Time.at(event.start_timestamp) }]
+    end
+
+    Rails.logger.info("[Subscription] Scheduling incident fetch for #{event.schedule_name}")
 
     Resque.set_schedule(
       event.schedule_name,
       {
         class: 'FetchEventIncidents',
-        args: event,
-        every: ['1m', { first_at: Time.at(event_data['startTimestamp']) }]
+        args: event.id,
+        persist: true,
+        every: every
       }
     )
   end

@@ -1,6 +1,7 @@
-require_relative "boot"
+require_relative 'boot'
 
-require "rails/all"
+require 'rails/all'
+require 'rake'
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -16,7 +17,19 @@ module RubyGoalbot
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    # config.time_zone = "Central Time (US & Canada)"
+    config.time_zone = 'America/Bogota'
     # config.eager_load_paths << Rails.root.join("extras")
+    #
+    config.after_initialize do
+      Rails.logger.info '[Application] Scheduling day events fetch.'
+      Resque.set_schedule(
+        'day_events',
+        {
+          class: 'FetchDayEvents',
+          persist: true,
+          every: ['6h', { first_in: '1s' }]
+        }
+      )
+    end
   end
 end
