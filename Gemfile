@@ -37,6 +37,8 @@ gem 'resque'
 
 gem 'resque-scheduler'
 
+gem 'configatron'
+
 # Use Redis adapter to run Action Cable in production
 # gem "redis", "~> 4.0"
 

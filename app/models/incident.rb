@@ -61,9 +61,10 @@ class Incident < ApplicationRecord
 
       Rails.logger.info('[Incident] Sending http request to bot')
       response = HTTParty.post(
-        ENV['HANGOUTS_CALLBACK_URL'],
+        configatron.hangouts.callback_url,
         {
-          body: { sendto: subscription.conversation_id, key: ENV['HANGOUTS_API_KEY'], content: video_message }.to_json,
+          body: { sendto: subscription.conversation_id, key: configatron.hangouts.api_key,
+                  content: video_message }.to_json,
           headers: { 'Content-Type' => 'application/json' },
           verify: false
         }

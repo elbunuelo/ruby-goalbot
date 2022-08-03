@@ -1,5 +1,5 @@
 module Api
-  BASE_URL = ENV['API_URL'].freeze
+  BASE_URL = configatron.api.url
   EVENTS_URL = "#{BASE_URL}/api/v1/sport/football/scheduled-events/{{date}}".freeze
   INCIDENTS_URL = "#{BASE_URL}/api/v1/event/{{match_id}}/incidents".freeze
   SEARCH_URL = "#{BASE_URL}/api/v1/search/{{search}}/0".freeze
@@ -15,14 +15,14 @@ module Api
       url = Api::EVENTS_URL.sub '{{date}}', date
       response = HTTParty.get(url)
 
-      response.parsed_response['events'].map { |e| Event.from_hash(e) }
+      response.parsed_response['events']&.map { |e| Event.from_hash(e) }
     end
 
     def self.fetch_incidents(match_id)
       url = Api::INCIDENTS_URL.sub '{{match_id}}', match_id.to_s
       response = HTTParty.get(url)
 
-      response.parsed_response['incidents'].map { |i| Incident.from_hash(i) }
+      response.parsed_response['incidents']&.map { |i| Incident.from_hash(i) }
     end
 
     def self._search(search, &block)
