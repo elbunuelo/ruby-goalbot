@@ -1,0 +1,2 @@
+module TeamAliasesHelper
+end

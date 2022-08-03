@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @team_alias %>
+
+<div>
+  <%= link_to "Edit this team alias", edit_team_alias_path(@team_alias) %> |
+  <%= link_to "Back to team aliases", team_aliases_path %>
+
+  <%= button_to "Destroy this team alias", @team_alias, method: :delete %>
+</div>

@@ -5,8 +5,6 @@ class Event < ApplicationRecord
   has_many :incidents, dependent: :destroy
   has_many :subscriptions, dependent: :destroy
 
-  scope :todays_events, -> { where(date: Date.today) }
-
   def monitored?
     subscriptions.exists?
   end
@@ -15,8 +13,8 @@ class Event < ApplicationRecord
     "#{slug}-#{date}"
   end
 
-  def self.for_team(team)
-    Event.todays_events.where('home_team_id = ? OR away_team_id = ?', team.id, team.id).first
+  def title
+    "#{home_team.name} - #{away_team.name}"
   end
 
   def self.from_hash(event_data)

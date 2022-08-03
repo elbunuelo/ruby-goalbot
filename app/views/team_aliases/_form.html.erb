@@ -1,0 +1,27 @@
+<%= form_with(model: team_alias) do |form| %>
+  <% if team_alias.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(team_alias.errors.count, "error") %> prohibited this team_alias from being saved:</h2>
+
+      <ul>
+        <% team_alias.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :team_id, style: "display: block" %>
+    <%= form.text_field :team_id %>
+  </div>
+
+  <div>
+    <%= form.label :alias, style: "display: block" %>
+    <%= form.text_field :alias %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

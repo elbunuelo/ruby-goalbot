@@ -1,8 +1,9 @@
 class Incident < ApplicationRecord
   belongs_to :event
 
-  after_create :maybe_cancel_incident_fetch
+  before_create :maybe_set_searching_since
   after_create :maybe_schedule_search_cancellation
+  after_update :maybe_send_subscription_messages
 
   scope :goals_pending_link, lambda {
                                where(incident_type: Incidents::Types::GOAL, search_suspended: false, video_url: nil)
@@ -28,39 +29,72 @@ class Incident < ApplicationRecord
     )
   end
 
+  def video_message
+    message = event.home_team.name
+    message += ' ⚽' if is_home
+    message += " #{home_score} - #{away_score}"
+    message += ' ⚽' unless is_home
+    message + " #{event.away_team.name} -- #{video_url}"
+  end
+
   private
 
-  def maybe_cancel_incident_fetch
-    return unless incident_type == Incidents::Types::PERIOD && text == 'FT'
+  def maybe_set_searching_since
+    return unless incident_type == Incidents::Types::GOAL
+    return unless event.monitored?
 
-    Resque.remove_schedule(event.schedule_name)
+    searching_since = Time.now
   end
 
   def maybe_schedule_search_cancellation
     return unless incident_type == Incidents::Types::GOAL
 
-    Rake.enqueue_in(Incidents::MAX_SEARCH_TIME, CancelGoalSearch, id)
+    Resque.enqueue_in(Incidents::MAX_SEARCH_TIME, CancelGoalSearch, id)
+  end
+
+  def maybe_send_subscription_messages
+    return unless incident_type == Incidents::Types::GOAL
+    return unless video_url
+
+    event.subscriptions.each do |subscription|
+      next unless subscription.conversation_id.present?
+
+      Rails.logger.info('[Incident] Sending http request to bot')
+      response = HTTParty.post(
+        ENV['HANGOUTS_CALLBACK_URL'],
+        {
+          body: { sendto: subscription.conversation_id, key: ENV['HANGOUTS_API_KEY'], content: video_message }.to_json,
+          headers: { 'Content-Type' => 'application/json' },
+          verify: false
+        }
+      )
+      Rails.logger.info("[Incident] Response received #{response.code} - #{response.parsed_response}")
+    end
   end
 
   def self.from_hash(incident_data)
+    incident = findy_by(ss_id: incident_data['id'])
+
     player_name = incident_data.fetch('player_name', nil) || incident_data.fetch('player', {}).fetch('name', nil)
 
-    {
-      player_name: player_name,
-      reason: incident_data.fetch('reason', nil),
-      incident_class: incident_data.fetch('incidentClass', nil),
-      incident_type: incident_data.fetch('incidentType', nil),
-      time: incident_data.fetch('time', nil),
-      ss_id: incident_data.fetch('id', nil),
-      is_home: incident_data.fetch('isHome', nil),
-      text: incident_data.fetch('text', nil),
-      home_score: incident_data.fetch('homeScore', nil),
-      away_score: incident_data.fetch('awayScore', nil),
-      added_time: incident_data.fetch('addedTime', nil),
-      player_in: incident_data.fetch('playerIn', {}).fetch('name', nil),
-      player_out: incident_data.fetch('playerOut', {}).fetch('name', nil),
-      length: incident_data.fetch('length', nil),
-      description: incident_data.fetch('description', nil)
-    }
+    incident || create!(
+      {
+        player_name: player_name,
+        reason: incident_data.fetch('reason', nil),
+        incident_class: incident_data.fetch('incidentClass', nil),
+        incident_type: incident_data.fetch('incidentType', nil),
+        time: incident_data.fetch('time', nil),
+        ss_id: incident_data.fetch('id', nil),
+        is_home: incident_data.fetch('isHome', nil),
+        text: incident_data.fetch('text', nil),
+        home_score: incident_data.fetch('homeScore', nil),
+        away_score: incident_data.fetch('awayScore', nil),
+        added_time: incident_data.fetch('addedTime', nil),
+        player_in: incident_data.fetch('playerIn', {}).fetch('name', nil),
+        player_out: incident_data.fetch('playerOut', {}).fetch('name', nil),
+        length: incident_data.fetch('length', nil),
+        description: incident_data.fetch('description', nil)
+      }
+    )
   end
 end

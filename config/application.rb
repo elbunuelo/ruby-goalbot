@@ -20,17 +20,17 @@ module RubyGoalbot
     config.time_zone = 'America/Bogota'
     # config.eager_load_paths << Rails.root.join("extras")
     #
-    config.after_initialize do
-      Rails.logger.info '[Application] Scheduling day events fetch.'
-      Resque.set_schedule(
-        'day_events',
-        {
-          class: 'FetchDayEvents',
-          persist: true,
-          every: '6h'
-        }
-      )
-      FetchDayEvents.perform
-    end
+    # config.after_initialize do
+    # Rails.logger.info '[Application] Scheduling day events fetch.'
+    # Resque.set_schedule(
+    # 'day_events',
+    # {
+    # class: 'FetchDayEvents',
+    # persist: true,
+    # every: '6h'
+    # }
+    # )
+    # FetchDayEvents.perform
+    # end
   end
 end

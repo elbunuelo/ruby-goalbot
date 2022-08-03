@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_07_20_182822) do
+ActiveRecord::Schema[7.0].define(version: 2022_08_03_122022) do
   create_table "events", force: :cascade do |t|
     t.integer "start_timestamp"
     t.integer "previous_leg_ss_id"
@@ -67,6 +67,14 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_20_182822) do
     t.index ["event_id"], name: "index_subscriptions_on_event_id"
   end
 
+  create_table "team_aliases", force: :cascade do |t|
+    t.integer "team_id", null: false
+    t.string "alias"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["team_id"], name: "index_team_aliases_on_team_id"
+  end
+
   create_table "teams", force: :cascade do |t|
     t.string "name"
     t.string "slug"
@@ -80,4 +88,5 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_20_182822) do
   add_foreign_key "events", "teams", column: "home_team_id"
   add_foreign_key "incidents", "events"
   add_foreign_key "subscriptions", "events"
+  add_foreign_key "team_aliases", "teams"
 end

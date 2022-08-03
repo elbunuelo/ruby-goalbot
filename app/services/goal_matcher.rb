@@ -26,7 +26,7 @@ SINGLE_SCORE_STR = ''.freeze
 # The home_score and away_score values contain just the value of the scores,
 # while full_home_score and away_home_score may include the indicators who
 # scored.
-SCORE_REGEX = '(?<full_home_score>[\\[(]?(?<home_score>\\d+)[\\])]?)\\s*-\\s*(?<full_away_score>[\\[(]?(?<away_score>\\d+)[\\])]?)'.freeze
+SCORE_REGEX = '\\s+(?<full_home_score>[\\[(]?(?<home_score>1?\\d)[\\])]?)\\s*-\\s*(?<full_away_score>[\\[(]?(?<away_score>1?\\d)[\\])]?)'.freeze
 
 # The category appears at the begining of the string as text within brackets
 CATEGORY_REGEX = '^(?<category>\\[[^\\]]+\\])'.freeze
@@ -38,12 +38,22 @@ CATEGORY_REGEX = '^(?<category>\\[[^\\]]+\\])'.freeze
 #
 # The team regex matches anything but an open bracket to make sure that we
 # don't capture the aggregate as part of the submission.
-TEAM_REGEX = '(?<team>[^\\[\\(]+)'.freeze
+TEAM_REGEX = '(?<team>[^\\[]+)'.freeze
 FIRST_PART_REGEX = "#{CATEGORY_REGEX}?\\s*#{TEAM_REGEX}".freeze
 
 class GoalMatcher
   def self.check(title)
     Rails.logger.info "[GoalMatcher] Checking submission for goal format #{title}"
+
+    # Post match threads match the format we're looking for pretty much
+    # exactly but we're not interested in them.
+    #
+    # Post Match Thread: Malmo FF 0-2 Zalgiris Vilnius | UEFA Champions League Qualifying
+    if title.downcase.start_with? 'post match thread'
+      Rails.logger.info '[GoalMatcher] Skipping Post match trhead submission'
+      raise Errors::NoGoalMatch, title
+    end
+
     # Goal may have a qualifier like great goal or the league:
     #
     # Lusitano GC 0-6 FC Porto - Hernâni 90' (Scorpion Goal - Taça de Portugal)
@@ -130,7 +140,7 @@ class GoalMatcher
     post = score_match.post_match.strip
     player_part_separator_str = '(--?|:|\\|)\\s+'
     player_part_separator_regexp = Regexp.new(player_part_separator_str)
-    player_part_separator = post.match(player_part_separator_regexp).to_s
+    player_part_separator = post.match(player_part_separator_regexp)
 
     # The absence of a separator most likely indicates that the submission is not
     # actually a goal.
@@ -141,7 +151,7 @@ class GoalMatcher
     # After finding out what the separator is, we can use it to remove the player
     # and time part from the submission, we don't really care about it. We're
     # left with the away team name.
-    away_team_part = post.split(player_part_separator)[0].strip
+    away_team_part = post.split(player_part_separator.to_s)[0].strip
 
     away_team_match = away_team_part.match TEAM_REGEX
     away_team = away_team_match.named_captures['team']
