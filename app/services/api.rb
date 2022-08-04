@@ -18,11 +18,11 @@ module Api
       response.parsed_response['events']&.map { |e| Event.from_hash(e) }
     end
 
-    def self.fetch_incidents(match_id)
-      url = Api::INCIDENTS_URL.sub '{{match_id}}', match_id.to_s
+    def self.fetch_incidents(event)
+      url = Api::INCIDENTS_URL.sub '{{match_id}}', event.ss_id.to_s
       response = HTTParty.get(url)
 
-      response.parsed_response['incidents']&.map { |i| Incident.from_hash(i) }
+      response.parsed_response['incidents']&.map { |i| Incident.from_hash(i.merge({ event: event })) }
     end
 
     def self._search(search, &block)

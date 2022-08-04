@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_08_03_122022) do
+ActiveRecord::Schema[7.0].define(version: 2022_08_04_135233) do
   create_table "events", force: :cascade do |t|
     t.integer "start_timestamp"
     t.integer "previous_leg_ss_id"
@@ -48,6 +48,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_03_122022) do
     t.datetime "searching_since"
     t.string "video_url"
     t.boolean "search_suspended", default: false
+    t.boolean "notifications_sent"
     t.index ["event_id"], name: "index_incidents_on_event_id"
   end
 

@@ -1,13 +1,34 @@
 require 'redd'
 
+MAX_SUBMISSIONS = 50
 class Reddit
-  def self.process_submissions(&block)
+  @last_seen = nil
+  def self.process_submissions
     login unless @session
 
-    @session.subreddit('soccer').new.stream(&block)
+    loop do
+      Rails.logger.info '[Reddit] Fetching new submissions from reddit'
+      Rails.logger.info("[Reddit] Last submission seen '#{@last_seen.title}'") if @last_seen
+      @last_seen = nil if @last_seen && @session.from_url(@last_seen.url).deleted?
+      submissions = @session.subreddit('soccer').new(before: @last_seen&.name || '')
+
+      submissions.each_with_index do |submission, index|
+        break if index == MAX_SUBMISSIONS
+
+        if index.zero?
+          @last_seen = submission
+          Rails.logger.info "[Reddit] Recording last seen submission #{@last_seen.title}"
+        end
+
+        yield submission
+      end
+
+      sleep configatron.reddit.interval
+    end
   end
 
   def self.login
+    Rails.logger.info '[Reddit] Logging into reddit'
     @session = Redd.it(
       user_agent: configatron.reddit.user_agent,
       client_id: configatron.reddit.client_id,

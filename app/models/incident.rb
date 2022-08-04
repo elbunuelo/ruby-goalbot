@@ -53,6 +53,7 @@ class Incident < ApplicationRecord
   end
 
   def maybe_send_subscription_messages
+    return if notifictions_sent
     return unless incident_type == Incidents::Types::GOAL
     return unless video_url
 
@@ -71,14 +72,18 @@ class Incident < ApplicationRecord
       )
       Rails.logger.info("[Incident] Response received #{response.code} - #{response.parsed_response}")
     end
+
+    self.notifications_sent = true
+    save
   end
 
   def self.from_hash(incident_data)
-    incident = findy_by(ss_id: incident_data['id'])
+    incident = find_by(ss_id: incident_data['id'])
 
     player_name = incident_data.fetch('player_name', nil) || incident_data.fetch('player', {}).fetch('name', nil)
 
-    incident || create!(
+    event = incident_data.delete(:event)
+    incident || event.incidents.create!(
       {
         player_name: player_name,
         reason: incident_data.fetch('reason', nil),

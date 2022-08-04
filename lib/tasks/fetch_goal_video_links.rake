@@ -7,6 +7,8 @@ task fetch_goal_video_links: :environment do
   end
 
   Reddit.process_submissions do |submission|
+    next unless submission.link_flair_text == 'Media'
+
     Rails.logger.info "[GoalVideoLinks] Processing submission -- #{submission.title}"
     goal = match_goal submission.title
     next unless goal

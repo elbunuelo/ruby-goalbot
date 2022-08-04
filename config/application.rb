@@ -38,6 +38,7 @@ module RubyGoalbot
     configatron.reddit.secret = ENV['REDDIT_SECRET'].freeze
     configatron.reddit.client_id = ENV['REDDIT_CLIENT_ID'].freeze
     configatron.reddit.user_agent = ENV['BOT_USER_AGENT'].freeze
+    configatron.reddit.interval = 60.seconds
 
     configatron.api.url = ENV['API_URL'].freeze
 
