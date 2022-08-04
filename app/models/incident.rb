@@ -53,7 +53,7 @@ class Incident < ApplicationRecord
   end
 
   def maybe_send_subscription_messages
-    return if notifictions_sent
+    return if notifications_sent
     return unless incident_type == Incidents::Types::GOAL
     return unless video_url
 

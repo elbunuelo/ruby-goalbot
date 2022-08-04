@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/elbunuelo/redd.git
-  revision: 16aa5265f7e2e21edb9ae03c15f78d2f796617b5
+  revision: d09ba11b09558c9e3a3a1772ac1eeac2b1ad3c42
   specs:
-    redd (0.9.0.pre.4)
+    redd (0.9.0.pre.5)
       http (~> 2.2)
       lazy_lazer (~> 0.8.1)
 
@@ -80,7 +80,7 @@ GEM
       mize
       tins (~> 1.0)
     bindex (0.8.1)
-    bootsnap (1.12.0)
+    bootsnap (1.13.0)
       msgpack (~> 1.2)
     builder (3.2.4)
     capybara (3.37.1)
@@ -102,7 +102,7 @@ GEM
     digest (3.1.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
-    erubi (1.10.0)
+    erubi (1.11.0)
     et-orbi (1.2.7)
       tzinfo
     fugit (1.5.3)
