@@ -21,20 +21,7 @@ module RubyGoalbot
     #
     config.time_zone = 'America/Bogota'
     # config.eager_load_paths << Rails.root.join("extras")
-    #
-    # config.after_initialize do
-    # Rails.logger.info '[Application] Scheduling day events fetch.'
-    # Resque.set_schedule(
-    # 'day_events',
-    # {
-    # class: 'FetchDayEvents',
-    # persist: true,
-    # every: '6h'
-    # }
-    # )
-    # FetchDayEvents.perform
-    # end
-    #
+
     configatron.reddit.secret = ENV['REDDIT_SECRET'].freeze
     configatron.reddit.client_id = ENV['REDDIT_CLIENT_ID'].freeze
     configatron.reddit.user_agent = ENV['BOT_USER_AGENT'].freeze
@@ -46,5 +33,12 @@ module RubyGoalbot
 
     configatron.hangouts.callback_url = ENV['HANGOUTS_CALLBACK_URL'].freeze
     configatron.hangouts.api_key = ENV['HANGOUTS_API_KEY'].freeze
+
+    config.sass.preferred_syntax = :sass
+    config.sass.line_comments = false
+    config.sass.cache = false
+
+    I18n.available_locales = %i[en es]
+    I18n.default_locale = :en
   end
 end

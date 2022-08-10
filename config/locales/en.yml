@@ -30,4 +30,6 @@
 # available at https://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
+  following_match: "Following Match"
+  match_not_found: "Couldn't find the match"
+  team_not_found: "Couldn't find the team"

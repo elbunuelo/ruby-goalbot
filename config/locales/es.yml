@@ -1,0 +1,5 @@
+
+es:
+  following_match: "Siguiendo Partido"
+  match_not_found: "No encontré el partido"
+  team_not_found: "No encontré el equipo"

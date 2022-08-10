@@ -1,4 +1,7 @@
 class SubscriptionsController < ApplicationController
+  include Internationalized
+  around_action :switch_locale
+
   skip_before_action :verify_authenticity_token
 
   rescue_from Errors::EventNotFound, with: :render_not_found
@@ -12,18 +15,11 @@ class SubscriptionsController < ApplicationController
 
     event = EventManager.find_matching search_team
 
-    raise Errors::EventNotFound, "No events for #{search_team} found." unless event
+    raise Errors::EventNotFound, I18n.t(:match_not_found) unless event
 
-    subscription = event.subscriptions.build(all_params)
+    subscription = event.subscriptions.find_or_initialize_by(all_params)
 
-    if subscription.save
-      render json: subscription.event.to_json(
-        {
-          methods: :title,
-          only: %i[title]
-        }
-      )
-    end
+    render json: { message: "#{I18n.t :following_match} #{subscription.event.title}" } if subscription.save
   end
 
   private
