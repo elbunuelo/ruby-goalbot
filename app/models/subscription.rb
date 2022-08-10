@@ -1,7 +1,8 @@
 class Subscription < ApplicationRecord
   belongs_to :event
 
-  after_create :schedule_incident_fetch
+  # after_create :schedule_incident_fetch
+  after_save :schedule_incident_fetch
 
   private
 
@@ -20,7 +21,7 @@ class Subscription < ApplicationRecord
 
     Rails.logger.info("[Subscription] Scheduling incident fetch for #{event.schedule_name}")
 
-    Resque.set_schedule(
+    schedule = Resque.set_schedule(
       event.schedule_name,
       {
         class: 'FetchEventIncidents',
@@ -29,5 +30,7 @@ class Subscription < ApplicationRecord
         every: every
       }
     )
+
+    Rails.logger.info("[Subscription] Created schedule #{schedule.inspect}")
   end
 end

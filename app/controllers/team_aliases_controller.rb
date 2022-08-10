@@ -9,7 +9,7 @@ class TeamAliasesController < ApplicationController
     team_name = all_params.delete(:team_name)
 
     team = Team.search(team_name)
-    raise Errors::TeamNotFound, "Team #{team_name} not found" unless team
+    raise Errors::TeamNotFound, I18n.t(:team_not_found) unless team
 
     @team_alias = team.team_aliases.build(all_params)
 

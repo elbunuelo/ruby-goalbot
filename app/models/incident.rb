@@ -43,7 +43,7 @@ class Incident < ApplicationRecord
     return unless incident_type == Incidents::Types::GOAL
     return unless event.monitored?
 
-    searching_since = Time.now
+    self.searching_since = Time.now
   end
 
   def maybe_schedule_search_cancellation
@@ -78,19 +78,15 @@ class Incident < ApplicationRecord
   end
 
   def self.from_hash(incident_data)
-    incident = find_by(ss_id: incident_data['id'])
-
     player_name = incident_data.fetch('player_name', nil) || incident_data.fetch('player', {}).fetch('name', nil)
 
     event = incident_data.delete(:event)
-    incident || event.incidents.create!(
+    new_incident = event.incidents.find_or_initialize_by(
       {
-        player_name: player_name,
         reason: incident_data.fetch('reason', nil),
         incident_class: incident_data.fetch('incidentClass', nil),
         incident_type: incident_data.fetch('incidentType', nil),
         time: incident_data.fetch('time', nil),
-        ss_id: incident_data.fetch('id', nil),
         is_home: incident_data.fetch('isHome', nil),
         text: incident_data.fetch('text', nil),
         home_score: incident_data.fetch('homeScore', nil),
@@ -102,5 +98,13 @@ class Incident < ApplicationRecord
         description: incident_data.fetch('description', nil)
       }
     )
+
+    unless new_incident.ss_id
+      new_incident.ss_id = incident_data['id']
+      new_incident.player_name = player_name
+      new_incident.save
+    end
+
+    new_incident
   end
 end

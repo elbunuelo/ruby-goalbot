@@ -28,7 +28,7 @@ class Event < ApplicationRecord
         slug: event_data['slug'],
         home_team: Team.from_hash(event_data['homeTeam']),
         away_team: Team.from_hash(event_data['awayTeam']),
-        date: Date.today
+        date: Time.at(event_data['startTimestamp']).to_date
       }
     )
   end

@@ -7,7 +7,7 @@ class EventManager
 
     Rails.logger.info("Found event #{event.slug}")
 
-    event if event.date == Date.today
+    event
   end
 
   def self.fetch_incidents(event)
@@ -25,6 +25,7 @@ class EventManager
 
     incidents&.each do |incident|
       if incident.incident_type == Incidents::Types::PERIOD && incident.text == 'FT'
+        Resque.logger.info "[Incident Fetch] Game ended, removing schedule #{event.schedule_name}"
         Resque.remove_schedule(event.schedule_name)
       end
     end

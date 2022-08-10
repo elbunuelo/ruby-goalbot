@@ -48,7 +48,7 @@ class Team < ApplicationRecord
       Rails.logger.info("Found team in api search: #{team.name}") if team
     end
 
-    raise Errors::TeamNotFound, "Team #{search} not found." unless team
+    raise Errors::TeamNotFound, "#{I18n.t :team_not_found}: #{team_name}." unless team
 
     team
   end

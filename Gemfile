@@ -27,7 +27,8 @@ gem 'stimulus-rails'
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem 'jbuilder'
 
-gem 'redd', git: 'https://github.com/elbunuelo/redd.git'
+# gem 'redd', git: 'https://github.com/elbunuelo/redd.git'
+gem 'redd', path: '../redd'
 
 gem 'httparty'
 
@@ -36,6 +37,10 @@ gem 'amatch'
 gem 'resque'
 
 gem 'resque-scheduler'
+
+gem 'sass-rails'
+
+gem 'font-awesome-sass', '~> 6.1.2'
 
 gem 'configatron'
 
@@ -82,3 +87,5 @@ group :test do
   gem 'selenium-webdriver'
   gem 'webdrivers'
 end
+
+gem 'cssbundling-rails', '~> 1.1'

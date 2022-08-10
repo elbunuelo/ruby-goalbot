@@ -1,8 +1,7 @@
-GIT
-  remote: https://github.com/elbunuelo/redd.git
-  revision: d09ba11b09558c9e3a3a1772ac1eeac2b1ad3c42
+PATH
+  remote: ../redd
   specs:
-    redd (0.9.0.pre.5)
+    redd (0.9.0.pre.7)
       http (~> 2.2)
       lazy_lazer (~> 0.8.1)
 
@@ -96,6 +95,8 @@ GEM
     concurrent-ruby (1.1.10)
     configatron (4.5.1)
     crass (1.0.6)
+    cssbundling-rails (1.1.1)
+      railties (>= 6.0.0)
     debug (1.6.1)
       irb (>= 1.3.6)
       reline (>= 0.3.1)
@@ -105,6 +106,9 @@ GEM
     erubi (1.11.0)
     et-orbi (1.2.7)
       tzinfo
+    ffi (1.15.5)
+    font-awesome-sass (6.1.2)
+      sassc (~> 2.0)
     fugit (1.5.3)
       et-orbi (~> 1, >= 1.2.7)
       raabro (~> 1.4)
@@ -234,6 +238,16 @@ GEM
     rubyzip (2.3.2)
     rufus-scheduler (3.6.0)
       fugit (~> 1.1, >= 1.1.6)
+    sass-rails (6.0.0)
+      sassc-rails (~> 2.1, >= 2.1.1)
+    sassc (2.4.0)
+      ffi (~> 1.9)
+    sassc-rails (2.1.2)
+      railties (>= 4.0.0)
+      sassc (>= 2.0)
+      sprockets (> 3.0)
+      sprockets-rails
+      tilt
     selenium-webdriver (4.3.0)
       childprocess (>= 0.5, < 5.0)
       rexml (~> 3.2, >= 3.2.5)
@@ -296,7 +310,9 @@ DEPENDENCIES
   bootsnap
   capybara
   configatron
+  cssbundling-rails (~> 1.1)
   debug
+  font-awesome-sass (~> 6.1.2)
   httparty
   importmap-rails
   jbuilder
@@ -305,6 +321,7 @@ DEPENDENCIES
   redd!
   resque
   resque-scheduler
+  sass-rails
   selenium-webdriver
   sprockets-rails
   sqlite3 (~> 1.4)
