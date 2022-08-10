@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   scope '(:locale)', locale: /en|es/ do
     resources :team_aliases, only: [:create]
     resources :subscriptions, only: [:create]
+    delete 'subscriptions', to: 'subscriptions#destroy'
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

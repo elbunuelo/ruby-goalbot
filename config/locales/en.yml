@@ -33,3 +33,5 @@ en:
   following_match: "Following Match"
   match_not_found: "Couldn't find the match"
   team_not_found: "Couldn't find the team"
+  unfollowed_match: "Unfollowed match"
+  subscription_not_found: "Couldn't find the subscription"
